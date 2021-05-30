@@ -1,16 +1,15 @@
 const G = 6.6;
 
 export default class Particle {
-  constructor(mass, position, force, speed, id, sizefunction) {
+  constructor(mass, position, force, speed, id = 0) {
     this.mass = mass;
     this.position = position;
     this.force = force;
     this.speed = speed;
     this.id = id;
-    this.sizefunction = sizefunction;
   }
 
-  calculateForce(particles) {
+  calculateForce(particles, { mergeDistance = -10 } = {}) {
     let resultingForce = createVector(0, 0);
 
     for (let particle of particles) {
@@ -24,6 +23,12 @@ export default class Particle {
         particle.position.x,
         particle.position.y
       );
+
+      if (distance < mergeDistance) {
+        particle.mass += this.mass;
+        this.mass = 0;
+        continue;
+      }
 
       let magnitude = (G * (this.mass * particle.mass)) / distance ** 2;
 
@@ -52,17 +57,20 @@ export default class Particle {
     ); /*p5.Vector.mult(this.speed, deltaTime / 1000);*/
 
     this.position.add(positionIncrease);
-
-    console.log(this.position);
   }
 
-  draw({ xscale = 1, yscale = 1, debug = false } = {}) {
+  draw({
+    xscale = 1,
+    yscale = 1,
+    debug = false,
+    sizefunction = () => 10,
+  } = {}) {
     push();
     fill("BLUE");
     circle(
       this.position.x / xscale,
       this.position.y / yscale,
-      this.sizefunction(this.mass)
+      sizefunction(this.mass)
     );
 
     if (debug) {
