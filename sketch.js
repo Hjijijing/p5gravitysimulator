@@ -13,13 +13,17 @@ let idCounter = new Counter(0);
 export const renderOptions = {
   xscale: 1,
   yscale: 1,
-  debug: false,
-  fitToAll: true,
+  debug: true,
+  fitToAll: false,
+  trackfirst: true,
+  offsetx: 0,
+  offsety: 0,
   sizefunction: massToSize,
 };
 
 export const movementOptions = {
   timescale: 1,
+  playing: true
 };
 
 export const calculateForceOptions = {
@@ -35,8 +39,13 @@ window.setup = function () {
 window.draw = function () {
   background("BLACK");
 
-  moveParticles();
-  updateForces();
+  if(movementOptions.playing)
+  {
+    moveParticles();
+    updateForces();
+  }
+
+
   drawParticles();
 
   drawTools();
@@ -71,11 +80,22 @@ function drawParticles() {
       maxy = max(maxy, particle.position.y);
     });
 
+    console.log(miny, maxy);
+
     let w = maxx - minx;
     let h = maxy - miny;
 
-    renderOptions.xScale = w / width;
-    renderOptions.yScale = h / height;
+    renderOptions.xscale = w / width;
+    renderOptions.yscale = h / height;
+  }
+
+
+  if(renderOptions.trackfirst && particles.length > 0)
+  {
+    let first = particles[0];
+
+    renderOptions.offsetx = width/2 - first.position.x;
+    renderOptions.offsety = height/2 - first.position.y;
   }
 
   particles.forEach((particle) => {

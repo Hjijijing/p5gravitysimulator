@@ -1,7 +1,7 @@
 import Particle from "./particle.js";
 
 export default function initializeParticles(particles, counter) {
-  particles.push(
+ /*  particles.push(
     new Particle(
       10000,
       createVector(400, 400),
@@ -38,5 +38,5 @@ export default function initializeParticles(particles, counter) {
       createVector(13, 0),
       counter.increment()
     )
-  );
+  ); */
 }

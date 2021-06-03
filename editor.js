@@ -1,4 +1,4 @@
-import { renderOptions, addParticle } from "./sketch.js";
+import { renderOptions, addParticle, movementOptions } from "./sketch.js";
 import Particle from "./particle.js";
 
 const editorOptions = {
@@ -24,6 +24,8 @@ export function drawTools() {
     mouseY
   );
 
+  text(renderOptions.fitToAll + "\n" + renderOptions.yscale + "\n" + renderOptions.xscale, 10, 10);
+
   pop();
 }
 
@@ -37,7 +39,7 @@ window.mousePressed = function (event) {
   if (event.button == 0) {
     let particle = new Particle(
       mass,
-      createVector(mouseX, mouseY),
+      createVector(mouseX - renderOptions.offsetx, mouseY-renderOptions.offsety),
       createVector(0, 0),
       createVector(random(-10, 10), random(-10, 10))
     );
@@ -45,3 +47,11 @@ window.mousePressed = function (event) {
     console.log(particle);
   }
 };
+
+window.keyPressed = function()
+{
+  if(keyCode == 32)
+  {
+    movementOptions.playing = !movementOptions.playing;
+  }
+}

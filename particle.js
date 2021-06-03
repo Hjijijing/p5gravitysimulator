@@ -63,23 +63,37 @@ export default class Particle {
     xscale = 1,
     yscale = 1,
     debug = false,
+    offsetx = 0,
+    offsety = 0,
     sizefunction = () => 10,
   } = {}) {
     push();
     fill("BLUE");
+
+    let x = this.position.x + offsetx;
+    let y = this.position.y + offsety;
+
     circle(
-      this.position.x / xscale,
-      this.position.y / yscale,
+      x / xscale,
+      y / yscale,
       sizefunction(this.mass)
     );
 
     if (debug) {
       stroke("RED");
       line(
-        this.position.x,
-        this.position.y,
-        this.position.x + this.force.x,
-        this.position.y + this.force.y
+        x,
+        y,
+        x + this.force.x,
+        y + this.force.y
+      );
+
+      stroke("GREEN");
+      line(
+        x,
+        y,
+        x + this.speed.x,
+        y + this.speed.y
       );
     }
 
