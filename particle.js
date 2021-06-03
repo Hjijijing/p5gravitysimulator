@@ -1,3 +1,6 @@
+import { clamp } from "./mathfunctions.js";
+import { addCollision } from "./sketch.js";
+
 const G = 6.6;
 
 export default class Particle {
@@ -9,7 +12,7 @@ export default class Particle {
     this.id = id;
   }
 
-  calculateForce(particles, { mergeDistance = -10 } = {}) {
+  calculateForce(particles, { mergeDistance = -10, absorptionscale } = {}) {
     let resultingForce = createVector(0, 0);
 
     for (let particle of particles) {
@@ -25,8 +28,7 @@ export default class Particle {
       );
 
       if (distance < mergeDistance) {
-        particle.mass += this.mass;
-        this.mass = 0;
+        addCollision(this, particle);
         continue;
       }
 
@@ -42,7 +44,14 @@ export default class Particle {
     this.force = resultingForce;
   }
 
-  move({ timescale = 1 } = {}) {
+  move({
+    timescale = 1,
+    minimumx,
+    maximumx,
+    minimumy,
+    maximumy,
+    collisionscale,
+  } = {}) {
     let speedIncrease = p5.Vector.div(this.force, this.mass).mult(
       timescale
     ); /*.mult(
@@ -57,6 +66,22 @@ export default class Particle {
     ); /*p5.Vector.mult(this.speed, deltaTime / 1000);*/
 
     this.position.add(positionIncrease);
+
+    if (this.position.x < minimumx || this.position.x > maximumx) {
+      let newX = clamp(this.position.x, minimumx, maximumx);
+      this.position.x = newX;
+
+      this.speed.x = -this.speed.x;
+      this.speed.mult(collisionscale);
+    }
+
+    if (this.position.y < minimumy || this.position.y > maximumy) {
+      let newY = clamp(this.position.y, minimumy, maximumy);
+      this.position.y = newY;
+
+      this.speed.y = -this.speed.y;
+      this.speed.mult(collisionscale);
+    }
   }
 
   draw({
@@ -70,31 +95,17 @@ export default class Particle {
     push();
     fill("BLUE");
 
-    let x = this.position.x + offsetx;
-    let y = this.position.y + offsety;
+    let x = (this.position.x + offsetx) / xscale;
+    let y = (this.position.y + offsety) / yscale;
 
-    circle(
-      x / xscale,
-      y / yscale,
-      sizefunction(this.mass)
-    );
+    circle(x, y, sizefunction(this.mass));
 
     if (debug) {
       stroke("RED");
-      line(
-        x,
-        y,
-        x + this.force.x,
-        y + this.force.y
-      );
+      line(x, y, x + this.force.x, y + this.force.y);
 
       stroke("GREEN");
-      line(
-        x,
-        y,
-        x + this.speed.x,
-        y + this.speed.y
-      );
+      line(x, y, x + this.speed.x, y + this.speed.y);
     }
 
     pop();
